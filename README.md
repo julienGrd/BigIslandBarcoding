@@ -1,5 +1,7 @@
 Fork from https://github.com/Redth/BigIslandBarcoding with code updated to make it run and compile following the last visual studios version and MAUI preview
 
+Current preview : 14
+
 # ZXing.Net.MAUI
 The successor to ZXing.Net.Mobile
 
