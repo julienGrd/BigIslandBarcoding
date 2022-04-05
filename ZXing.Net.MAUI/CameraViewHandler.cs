@@ -22,7 +22,7 @@ namespace ZXing.Net.Maui
 			[nameof(ICameraView.Focus)] = MapFocus,
 			[nameof(ICameraView.AutoFocus)] = MapAutoFocus,
 		};
-		
+
 		CameraManager cameraManager;
 
 		public event EventHandler<CameraFrameBufferEventArgs> FrameReady;
@@ -35,13 +35,6 @@ namespace ZXing.Net.Maui
 		{
 		}
 
-		protected override NativePlatformCameraPreviewView CreateNativeView()
-		{
-			if (cameraManager == null)
-				cameraManager = new(MauiContext, VirtualView?.CameraLocation ?? CameraLocation.Rear);
-			var v = cameraManager.CreateNativeView();
-			return v;
-		}
 
 		protected override async void ConnectHandler(NativePlatformCameraPreviewView nativeView)
 		{
@@ -84,5 +77,17 @@ namespace ZXing.Net.Maui
 
 		public static void MapAutoFocus(CameraViewHandler handler, ICameraView cameraBarcodeReaderView, object? parameters)
 			=> handler.AutoFocus();
+
+		protected override NativePlatformCameraPreviewView CreatePlatformView()
+		{
+			if (cameraManager == null)
+				cameraManager = new(MauiContext, VirtualView?.CameraLocation ?? CameraLocation.Rear);
+#if IOS || MACCATALYST
+			var v = cameraManager.CreatePlatformView();
+#elif ANDROID
+			var v = cameraManager.CreateNativeView();
+#endif
+			return v;
+		}
 	}
 }

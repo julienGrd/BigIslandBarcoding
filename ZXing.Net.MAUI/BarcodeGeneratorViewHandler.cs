@@ -31,27 +31,22 @@ namespace ZXing.Net.Maui
 			writer = new BarcodeWriter();
 		}
 
-		public override void NativeArrange(Rectangle rect)
+		public override void PlatformArrange(Rect frame)
 		{
-			base.NativeArrange(rect);
+			base.PlatformArrange(frame);
 
-			desiredSize = rect.Size;
+
+			desiredSize = frame.Size;
 
 			UpdateBarcode();
 		}
 
 		NativePlatformImageView imageView;
 
-		protected override NativePlatformImageView CreateNativeView()
-		{
-#if IOS || MACCATALYST
-			imageView ??= new UIKit.UIImageView { BackgroundColor = UIKit.UIColor.Clear };
-#elif ANDROID
-			imageView = new NativePlatformImageView(Context);
-			imageView.SetBackgroundColor(Android.Graphics.Color.Transparent);
-#endif
-			return imageView;
-		}
+		//protected override NativePlatformImageView CreateNativeView()
+		//{
+
+		//}
 
 		protected override void ConnectHandler(NativePlatformImageView nativeView)
 		{
@@ -82,5 +77,16 @@ namespace ZXing.Net.Maui
 
 		public static void MapUpdateBarcode(BarcodeGeneratorViewHandler handler, IBarcodeGeneratorView barcodeGeneratorView)
 			=> handler.UpdateBarcode();
+
+		protected override NativePlatformImageView CreatePlatformView()
+		{
+#if IOS || MACCATALYST
+			imageView ??= new UIKit.UIImageView { BackgroundColor = UIKit.UIColor.Clear };
+#elif ANDROID
+			imageView = new NativePlatformImageView(Context);
+			imageView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+#endif
+			return imageView;
+		}
 	}
 }

@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
-using System;
-using System.Linq;
 
 namespace ZXing.Net.Maui
 {
@@ -41,13 +39,6 @@ namespace ZXing.Net.Maui
 		protected Readers.IBarcodeReader BarcodeReader
 			=> Services.GetService<Readers.IBarcodeReader>();
 
-		protected override NativePlatformCameraPreviewView CreateNativeView()
-		{
-			if (cameraManager == null)
-				cameraManager = new(MauiContext, VirtualView?.CameraLocation ?? CameraLocation.Rear);
-			var v = cameraManager.CreateNativeView();
-			return v;
-		}
 
 		protected override async void ConnectHandler(NativePlatformCameraPreviewView nativeView)
 		{
@@ -103,5 +94,18 @@ namespace ZXing.Net.Maui
 
 		public static void MapAutoFocus(CameraBarcodeReaderViewHandler handler, ICameraBarcodeReaderView cameraBarcodeReaderView, object? parameters)
 			=> handler.AutoFocus();
+
+		protected override NativePlatformCameraPreviewView CreatePlatformView()
+		{
+			if (cameraManager == null)
+				cameraManager = new(MauiContext, VirtualView?.CameraLocation ?? CameraLocation.Rear);
+#if IOS || MACCATALYST
+			var v = cameraManager.CreatePlatformView();
+#elif ANDROID
+			var v = cameraManager.CreateNativeView();
+#endif
+			return v;
+		}
+
 	}
 }
