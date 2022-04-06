@@ -16,7 +16,7 @@
     <AssemblyFileVersion>$(PackageVersion)</AssemblyFileVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Description>barcode scanner for .NET MAUI, fork from https://github.com/Redth/BigIslandBarcoding to make it work with last preview</Description>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <DebugType>portable</DebugType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!--<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-android'">21.0</SupportedOSPlatformVersion>-->
