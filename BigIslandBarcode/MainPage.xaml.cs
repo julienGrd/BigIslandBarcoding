@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
-using Microsoft.Maui.Essentials;
 using ZXing.Net.Maui;
 
 namespace BigIslandBarcode
