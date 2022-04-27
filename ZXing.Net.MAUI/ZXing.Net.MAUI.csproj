@@ -16,7 +16,7 @@
     <AssemblyFileVersion>$(PackageVersion)</AssemblyFileVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Description>barcode scanner for .NET MAUI, fork from https://github.com/Redth/BigIslandBarcoding to make it work with last preview</Description>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <DebugType>portable</DebugType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!--<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-android'">21.0</SupportedOSPlatformVersion>-->
@@ -29,7 +29,7 @@
     <AndroidManifest Include="Platforms/Android/AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Graphics" Version="6.0.300-rc.1.1215" />
+    <!--<PackageReference Include="Microsoft.Maui.Graphics" Version="6.0.300-rc.1.1215" />-->
     <PackageReference Include="ZXing.Net" Version="0.16.8" />
   </ItemGroup>
 </Project>
