@@ -106,23 +106,18 @@ namespace ZXing.Net.Maui
 					captureDevice = null;
 				}
 
-				var devices = AVCaptureDevice.DevicesWithMediaType(AVMediaTypes.Video.ToString());
-				foreach (var device in devices)
-				{
-					if (CameraLocation == CameraLocation.Front &&
-						device.Position == AVCaptureDevicePosition.Front)
-					{
-						captureDevice = device;
-						break;
-					}
-					else if (CameraLocation == CameraLocation.Rear && device.Position == AVCaptureDevicePosition.Back)
-					{
-						captureDevice = device;
-						break;
-					}
+				if (CameraLocation == CameraLocation.Front)
+                {
+					using var frontCameras =  AVCaptureDeviceDiscoverySession.Create(new[] { AVCaptureDeviceType.BuiltInDualCamera, AVCaptureDeviceType.BuiltInDualWideCamera, AVCaptureDeviceType.BuiltInDuoCamera, AVCaptureDeviceType.BuiltInLiDarDepthCamera, AVCaptureDeviceType.BuiltInMicrophone, AVCaptureDeviceType.BuiltInTelephotoCamera, AVCaptureDeviceType.BuiltInTripleCamera, AVCaptureDeviceType.BuiltInTrueDepthCamera, AVCaptureDeviceType.BuiltInUltraWideCamera, AVCaptureDeviceType.BuiltInWideAngleCamera, AVCaptureDeviceType.ExternalUnknown }, AVMediaTypes.Video, AVCaptureDevicePosition.Front);
+					captureDevice = frontCameras?.Devices?.FirstOrDefault();
+				}
+				else if (CameraLocation == CameraLocation.Rear)
+                {
+					using var backCameras = AVCaptureDeviceDiscoverySession.Create(new[] { AVCaptureDeviceType.BuiltInDualCamera, AVCaptureDeviceType.BuiltInDualWideCamera, AVCaptureDeviceType.BuiltInDuoCamera, AVCaptureDeviceType.BuiltInLiDarDepthCamera, AVCaptureDeviceType.BuiltInMicrophone, AVCaptureDeviceType.BuiltInTelephotoCamera, AVCaptureDeviceType.BuiltInTripleCamera, AVCaptureDeviceType.BuiltInTrueDepthCamera, AVCaptureDeviceType.BuiltInUltraWideCamera, AVCaptureDeviceType.BuiltInWideAngleCamera, AVCaptureDeviceType.ExternalUnknown }, AVMediaTypes.Video, AVCaptureDevicePosition.Back);
+					captureDevice = backCameras?.Devices?.FirstOrDefault();
 				}
 
-				if (captureDevice == null)
+                if (captureDevice == null)
 					captureDevice = AVCaptureDevice.GetDefaultDevice(AVMediaTypes.Video);
 
 				captureInput = new AVCaptureDeviceInput(captureDevice, out var err);
@@ -143,7 +138,11 @@ namespace ZXing.Net.Maui
 		public void UpdateTorch(bool on)
 		{
 			if (captureDevice != null && captureDevice.HasTorch && captureDevice.TorchAvailable)
+            {
+				captureDevice.LockForConfiguration(out NSError error);
 				captureDevice.TorchMode = on ? AVCaptureTorchMode.On : AVCaptureTorchMode.Off;
+				captureDevice.UnlockForConfiguration();
+            }
 		}
 
 		public void Focus(Microsoft.Maui.Graphics.Point point)
