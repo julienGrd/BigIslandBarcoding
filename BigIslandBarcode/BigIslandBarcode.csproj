@@ -18,6 +18,11 @@
 
 		<UseSystemResourceKeys>false</UseSystemResourceKeys>
 
+		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-ios'">10.3.4</SupportedOSPlatformVersion>
+
+	</PropertyGroup>
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+      <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 	</PropertyGroup>
 
 	<ItemGroup>
