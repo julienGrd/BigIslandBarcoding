@@ -2,31 +2,28 @@
 using System.Threading.Tasks;
 using Microsoft.Maui;
 using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Graphics;
 
-namespace ZXing.Net.Maui
+namespace ZXing.Net.Maui;
+
+internal partial class CameraManager : IDisposable
 {
-	internal partial class CameraManager : IDisposable
-	{
-		public CameraManager(IMauiContext context, CameraLocation cameraLocation)
-		{
-			Context = context;
-			CameraLocation = cameraLocation;
-		}
+    internal CameraManager(CameraLocation cameraLocation)
+    {
+        CameraLocation = cameraLocation;
+    }
 
-		protected readonly IMauiContext Context;
-		public event EventHandler<CameraFrameBufferEventArgs> FrameReady;
+    public event EventHandler<CameraFrameBufferEventArgs> FrameReady;
 
-		public CameraLocation CameraLocation { get; private set; }
+    public CameraLocation CameraLocation { get; private set; }
 
-		public void UpdateCameraLocation(CameraLocation cameraLocation)
-		{
-			CameraLocation = cameraLocation;
+    public void UpdateCameraLocation(CameraLocation cameraLocation)
+    {
+        CameraLocation = cameraLocation;
 
-			UpdateCamera();
-		}
+        UpdateCamera();
+    }
 
-		public async Task<bool> CheckPermissions()
-			=> (await Permissions.RequestAsync<Permissions.Camera>()) == PermissionStatus.Granted;
-	}
+    public async Task<bool> CheckPermissions()
+        => (await Permissions.RequestAsync<Permissions.Camera>()) == PermissionStatus.Granted;
+
 }

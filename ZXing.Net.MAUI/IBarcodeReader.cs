@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
-namespace ZXing.Net.Maui.Readers
+namespace ZXing.Net.Maui.Readers;
+
+public interface IBarcodeReader
 {
-	public interface IBarcodeReader
-	{
-		BarcodeReaderOptions Options { get; set; }
+	BarcodeReaderOptions Options { get; set; }
 
-		BarcodeResult[] Decode(PixelBufferHolder image);
-	}
+	BarcodeResult[]? Decode(PixelBufferHolder image);
+
+    BarcodeResult[]? Decode(Stream stream);
 }

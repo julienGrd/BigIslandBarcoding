@@ -4,8 +4,6 @@
 <dict>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>MinimumOSVersion</key>
-	<string>10.3.4</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
@@ -30,7 +28,14 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+  
 	<key>NSCameraUsageDescription</key>
-	<string>Barcode Scanning</string>
+	<string>Required for barcode scanning</string>
+  
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>Required access to save barcode photos.</string>
+  
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Required access to barcode photos.</string>
 </dict>
 </plist>

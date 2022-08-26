@@ -1,17 +1,14 @@
-﻿using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;
+﻿using Microsoft.Maui.Controls;
 using Application = Microsoft.Maui.Controls.Application;
 
-namespace BigIslandBarcode
-{
-	public partial class App : Application
-	{
-		public App()
-		{
-			InitializeComponent();
+namespace BigIslandBarcode;
 
-			MainPage = new MainPage();
-		}
+public partial class App : Application
+{
+	public App()
+	{
+		InitializeComponent();
+
+		MainPage = new NavigationPage(new MainPage());
 	}
 }
