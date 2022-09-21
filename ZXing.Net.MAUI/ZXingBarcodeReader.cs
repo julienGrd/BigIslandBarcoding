@@ -20,9 +20,9 @@ public class ZXingBarcodeReader : IBarcodeReader
 		set
 		{
 			options = value;
-			_zxingReader.Options.PossibleFormats = Options.Formats.ToZXingList();
-			_zxingReader.Options.TryHarder = Options.TryHarder;
-			_zxingReader.AutoRotate = Options.AutoRotate;
+			_zxingReader.Options.PossibleFormats = options.Formats.ToZXingList();
+			_zxingReader.Options.TryHarder = options.TryHarder;
+			_zxingReader.AutoRotate = options.AutoRotate;
 		}
 	}
 

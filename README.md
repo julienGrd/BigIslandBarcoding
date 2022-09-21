@@ -3,7 +3,7 @@
 
 The successor to ZXing.Net.Mobile, providing barcode generation and scanning from a camera or files - and all cross platform! _(except windows - see below)_
 
-A fork of [Redth/BigIslandBarcoding](https://github.com/Redth/BigIslandBarcoding), with code reworks and improvements _(in my opinion)_
+A fork of [Redth/ZXing.Net.MAUI](https://github.com/Redth/ZXing.Net.MAUI), with code reworks and improvements _(in my opinion)_
 
 Android<br/>(Camera Scanning) | Windows<br/>(File Scanning) | Mac/iOS<br/>(Camera Scanning)
 :-:|:-:|:-:
@@ -21,6 +21,60 @@ Windows | 11 OR 10 (> 1809) | ✔ | ❌<sup>**Ŧ**</sup> | ✔
 <sup>**Ŧ**</sup> <small>_There is no MAUI support for the camera yet. We are monitoring CommunityToolkit/Maui#259 - For now, Windows just loads a black screen, you will need to detect/redirect_</small>
 
 <b>*</b> <small>_IOS version doesn't work (see [#1](https://github.com/julienGrd/BigIslandBarcoding/issues/1)). I can't test the IOS version so please investigate and submit a PR if you are able to correct it._</small>
+
+## Install ZXing.Net.MAUI
+
+1. Install [ZXing.Net.MAUI](https://www.nuget.org/packages/ZXing.Net.Maui) NuGet package on your .NET MAUI application
+
+1. Make sure to initialize the plugin first in your `MauiProgram.cs`, see below
+
+    ```csharp
+    // Add the using to the top
+    using ZXing.Net.Maui;
+    
+    // ... other code 
+    
+    public static MauiApp Create()
+    {
+    	var builder = MauiApp.CreateBuilder();
+    
+    	builder
+    		.UseMauiApp<App>()
+    		.UseBarcodeReader(); // Make sure to add this line
+    
+    	return builder.Build();
+    }
+    ```
+
+Now we just need to add the right permissions to our app metadata. Find below how to do that for each platform.
+
+#### Android
+
+For Android go to your `AndroidManifest.xml` file (under the Platforms\Android folder) and add the following permissions inside of the `manifest` node:
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+```
+
+#### iOS
+
+For iOS go to your `info.plist` file (under the Platforms\iOS folder) and add the following permissions inside of the `dict` node:
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>This app uses barcode scanning to...</string>
+```
+
+Make sure that you enter a clear and valid reason for your app to access the camera. This description will be shown to the user.
+
+#### Windows
+
+As stated above, Windows can not perform camera scanning. You can however use the image scanning and barcode generation. No extra permissions are required for these.
+
+For more information on permissions, see the [Microsoft Docs](https://docs.microsoft.com/dotnet/maui/platform-integration/appmodel/permissions).
+
+>⚠ If you're using the controls from XAML, make sure to add the right XML namespace in the root of your file
+>e.g: `xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI"`
 
 ## Usage
 

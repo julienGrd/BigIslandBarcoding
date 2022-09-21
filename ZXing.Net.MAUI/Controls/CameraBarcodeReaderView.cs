@@ -5,7 +5,7 @@ namespace ZXing.Net.Maui.Controls;
 
 public partial class CameraBarcodeReaderView : CameraView, ICameraBarcodeReaderView
 {
-	public event EventHandler<BarcodeDetectionEventArgs> BarcodesDetected;
+	public event EventHandler<BarcodeDetectionEventArgs>? BarcodesDetected;
 
 	protected override void OnHandlerChanging(HandlerChangingEventArgs args)
 	{

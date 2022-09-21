@@ -97,6 +97,7 @@ public partial class TakeImagePage : ContentPage
     {
         var fileResult = e.Argument as FileResult;
         BarcodeResult? result = null;
+        string? error = null;
 
         if (fileResult != null)
         {
@@ -111,9 +112,16 @@ public partial class TakeImagePage : ContentPage
                 ActivityLabel.Text = "Decoding";
             });
 
-            var decodeResult = _reader.Decode(stream);
+            try
+            {
+                var decodeResult = _reader.Decode(stream);
 
-            result = decodeResult?.FirstOrDefault();
+                result = decodeResult?.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                error = $"Error: {ex.Message}";
+            }
         }
 
         await MainThread.InvokeOnMainThreadAsync(() =>
@@ -125,13 +133,21 @@ public partial class TakeImagePage : ContentPage
             {
                 ParseResult.Text = $"Found Barcode\nValue: {result.Value}";
 
-                barcodeGenerator.IsVisible = true;
-                barcodeGenerator.Value = result.Value;
-                barcodeGenerator.Format = result.Format;
+                try
+                {
+                    barcodeGenerator.IsVisible = true;
+                    barcodeGenerator.Value = result.Value;
+                    barcodeGenerator.Format = result.Format;
+                }
+                catch (Exception ex)
+                {
+                    barcodeGenerator.IsVisible = false;
+                    ParseResult.Text = ex.Message;
+                }
             }
             else
             {
-                ParseResult.Text = "No Barcode Found";
+                ParseResult.Text = error ?? "No Barcode Found";
             }
 
             Worker_Completed(true, null!);

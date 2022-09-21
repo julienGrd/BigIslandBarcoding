@@ -15,10 +15,12 @@ public partial class CameraBarcodeReaderViewHandler : BaseCameraViewHandler<ICam
 		[nameof(ICameraBarcodeReaderView.CameraLocation)] = (handler, virtualView) => handler.CameraManager?.UpdateCameraLocation(virtualView.CameraLocation)
 	};
 
-	public event EventHandler<BarcodeDetectionEventArgs> BarcodesDetected;
+	public event EventHandler<BarcodeDetectionEventArgs>? BarcodesDetected;
 
-	protected Readers.IBarcodeReader BarcodeReader
-		=> Services!.GetService<Readers.IBarcodeReader>()!;
+    Readers.IBarcodeReader? _barcodeReader;
+
+    protected Readers.IBarcodeReader BarcodeReader
+		=> _barcodeReader ??= Services!.GetService<Readers.IBarcodeReader>()!;
 
 	internal override void CameraManager_FrameReady(object? sender, CameraFrameBufferEventArgs e)
 	{

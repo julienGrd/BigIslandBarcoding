@@ -22,7 +22,7 @@ public partial class CameraView : View, ICameraView
 		=> FrameReady?.Invoke(this, e);
 
 	public static readonly BindableProperty IsTorchOnProperty =
-		BindableProperty.Create(nameof(IsTorchOn), typeof(bool), typeof(CameraView), defaultValue: true);
+		BindableProperty.Create(nameof(IsTorchOn), typeof(bool), typeof(CameraView), defaultValue: false);
 
 	public bool IsTorchOn
 	{

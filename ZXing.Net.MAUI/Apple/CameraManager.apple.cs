@@ -23,7 +23,7 @@ internal partial class CameraManager
     AVCaptureVideoPreviewLayer _videoPreviewLayer;
     CaptureDelegate _captureDelegate;
     DispatchQueue _dispatchQueue;
-    static Dictionary<NSString, MSize> Resolutions => new()
+    static Dictionary<NSString, MSize> _availableResolutions => new()
     {
         { AVCaptureSession.Preset352x288, new MSize(352, 288) },
         { AVCaptureSession.PresetMedium, new MSize(480, 360) },
@@ -32,22 +32,24 @@ internal partial class CameraManager
         { AVCaptureSession.Preset1920x1080, new MSize(1920, 1080) },
         { AVCaptureSession.Preset3840x2160, new MSize(3840, 2160) },
     };
-    static AVCaptureDeviceType[] CameraTypes => new[] 
-        { 
-            AVCaptureDeviceType.BuiltInDualCamera, 
-            AVCaptureDeviceType.BuiltInDualWideCamera, 
-            AVCaptureDeviceType.BuiltInDuoCamera, 
-            AVCaptureDeviceType.BuiltInLiDarDepthCamera, 
-            AVCaptureDeviceType.BuiltInMicrophone, 
-            AVCaptureDeviceType.BuiltInTelephotoCamera, 
-            AVCaptureDeviceType.BuiltInTripleCamera, 
-            AVCaptureDeviceType.BuiltInTrueDepthCamera, 
-            AVCaptureDeviceType.BuiltInUltraWideCamera, 
-            AVCaptureDeviceType.BuiltInWideAngleCamera, 
+    static AVCaptureDeviceType[] _cameraTypes => new[]
+        {
+            AVCaptureDeviceType.BuiltInDualCamera,
+            AVCaptureDeviceType.BuiltInDualWideCamera,
+            AVCaptureDeviceType.BuiltInDuoCamera,
+            AVCaptureDeviceType.BuiltInLiDarDepthCamera,
+            AVCaptureDeviceType.BuiltInMicrophone,
+            AVCaptureDeviceType.BuiltInTelephotoCamera,
+            AVCaptureDeviceType.BuiltInTripleCamera,
+            AVCaptureDeviceType.BuiltInTrueDepthCamera,
+            AVCaptureDeviceType.BuiltInUltraWideCamera,
+            AVCaptureDeviceType.BuiltInWideAngleCamera,
             AVCaptureDeviceType.ExternalUnknown
         };
 
-public NativePlatformCameraPreviewView CreatePlatformView()
+    public Size TargetCaptureResolution { get; private set; } = MSize.Zero;
+
+    public NativePlatformCameraPreviewView CreatePlatformView()
     {
         _captureSession = new AVCaptureSession
         {
@@ -80,7 +82,7 @@ public NativePlatformCameraPreviewView CreatePlatformView()
 
             if (_captureDelegate == null)
             {
-                _captureDelegate = 
+                _captureDelegate =
                     new CaptureDelegate(
                         cvPixelBuffer =>
                             FrameReady?.Invoke(
@@ -107,75 +109,98 @@ public NativePlatformCameraPreviewView CreatePlatformView()
 
     public void UpdateCamera()
     {
-        if (_captureSession != null)
+        if (_captureSession.Running)
+            _captureSession.StopRunning();
+
+        // Cleanup old input
+        if (_captureInput != null && _captureSession.Inputs.Length > 0 && _captureSession.Inputs.Contains(_captureInput))
         {
-            if (_captureSession.Running)
-                _captureSession.StopRunning();
-
-            // Cleanup old input
-            if (_captureInput != null && _captureSession.Inputs.Length > 0 && _captureSession.Inputs.Contains(_captureInput))
-            {
-                _captureSession.RemoveInput(_captureInput);
-                _captureInput.Dispose();
-                _captureInput = null;
-            }
-
-            // Cleanup old device
-            if (_captureDevice != null)
-            {
-                _captureDevice.Dispose();
-                _captureDevice = null;
-            }
-
-            if (CameraLocation == CameraLocation.Front)
-            {
-                using var frontCameras = 
-                    AVCaptureDeviceDiscoverySession.Create(
-                        CameraTypes, 
-                        AVMediaTypes.Video, 
-                        AVCaptureDevicePosition.Front
-                    );
-                _captureDevice = frontCameras?.Devices?.FirstOrDefault();
-            }
-            else if (CameraLocation == CameraLocation.Rear)
-            {
-                using var backCameras = 
-                    AVCaptureDeviceDiscoverySession.Create(
-                        CameraTypes, 
-                        AVMediaTypes.Video, 
-                        AVCaptureDevicePosition.Back
-                    );
-                _captureDevice = backCameras?.Devices?.FirstOrDefault();
-            }
-
-            if (_captureDevice == null)
-                _captureDevice = AVCaptureDevice.GetDefaultDevice(AVMediaTypes.Video.GetConstant()!);
-
-            if (_captureDevice == null)
-                throw new NotSupportedException("No capture device found");
-
-            _captureInput = new AVCaptureDeviceInput(_captureDevice, out var _);
-
-            _captureSession.AddInput(_captureInput);
-
-            _captureSession.StartRunning();
+            _captureSession.RemoveInput(_captureInput);
+            _captureInput.Dispose();
+            _captureInput = null;
         }
+
+        // Cleanup old device
+        if (_captureDevice != null)
+        {
+            _captureDevice.Dispose();
+            _captureDevice = null;
+        }
+
+        var devices = AVCaptureDevice.DevicesWithMediaType(AVMediaTypes.Video.GetConstant());
+        foreach (var device in devices)
+        {
+            if (CameraLocation == CameraLocation.Front &&
+                device.Position == AVCaptureDevicePosition.Front)
+            {
+                _captureDevice = device;
+                break;
+            }
+            else if (CameraLocation == CameraLocation.Rear && device.Position == AVCaptureDevicePosition.Back)
+            {
+                _captureDevice = device;
+                break;
+            }
+        }
+
+        if (_captureDevice == null)
+            _captureDevice = AVCaptureDevice.GetDefaultDevice(AVMediaTypes.Video);
+
+        if (_captureDevice == null)
+            throw new NotSupportedException("No capture device found");
+
+        _captureInput = new AVCaptureDeviceInput(_captureDevice, out var err);
+
+        _captureSession.SessionPreset = findBestAVCaptureSessionPreset(TargetCaptureResolution);
+        _captureSession.AddInput(_captureInput);
+
+        _captureSession.StartRunning();
     }
 
 
     public void Disconnect()
     {
+        if (_captureSession.Running)
+            _captureSession.StopRunning();
+
         _captureSession.RemoveOutput(_videoDataOutput);
-        _captureSession.StopRunning();
+
+        // Cleanup old input
+        if (_captureInput != null && _captureSession.Inputs.Length > 0 && _captureSession.Inputs.Contains(_captureInput))
+        {
+            _captureSession.RemoveInput(_captureInput);
+            _captureInput.Dispose();
+            _captureInput = null;
+        }
+
+        // Cleanup old device
+        if (_captureDevice != null)
+        {
+            _captureDevice.Dispose();
+            _captureDevice = null;
+        }
     }
 
     public void UpdateTorch(bool on)
     {
         if (_captureDevice != null && _captureDevice.HasTorch && _captureDevice.TorchAvailable)
         {
-            _captureDevice.LockForConfiguration(out var _);
-            _captureDevice.TorchMode = on ? AVCaptureTorchMode.On : AVCaptureTorchMode.Off;
-            _captureDevice.UnlockForConfiguration();
+            {
+                var isOn = _captureDevice?.TorchActive ?? false;
+
+                try
+                {
+                    if (on != isOn)
+                    {
+                        CaptureDevicePerformWithLockedConfiguration(device =>
+                            device.TorchMode = on ? AVCaptureTorchMode.On : AVCaptureTorchMode.Off);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
         }
     }
 
@@ -184,17 +209,19 @@ public NativePlatformCameraPreviewView CreatePlatformView()
         if (_captureDevice == null)
             return;
 
+        var focusMode = AVCaptureFocusMode.AutoFocus;
+        if (_captureDevice.IsFocusModeSupported(AVCaptureFocusMode.ContinuousAutoFocus))
+            focusMode = AVCaptureFocusMode.ContinuousAutoFocus;
+
         //See if it supports focusing on a point
         if (_captureDevice.FocusPointOfInterestSupported && !_captureDevice.AdjustingFocus)
         {
-            //Lock device to config
-            if (_captureDevice.LockForConfiguration(out var _))
+            CaptureDevicePerformWithLockedConfiguration(device =>
             {
                 //Focus at the point touched
-                _captureDevice.FocusPointOfInterest = point;
-                _captureDevice.FocusMode = AVCaptureFocusMode.AutoFocus;
-                _captureDevice.UnlockForConfiguration();
-            }
+                device.FocusPointOfInterest = point;
+                device.FocusMode = focusMode;
+            });
         }
     }
 
@@ -207,18 +234,67 @@ public NativePlatformCameraPreviewView CreatePlatformView()
         if (_captureDevice.IsFocusModeSupported(AVCaptureFocusMode.ContinuousAutoFocus))
             focusMode = AVCaptureFocusMode.ContinuousAutoFocus;
 
-        //Lock device to config
-        if (_captureDevice.LockForConfiguration(out var _))
+        CaptureDevicePerformWithLockedConfiguration(device =>
         {
-            if (_captureDevice.FocusPointOfInterestSupported)
-                _captureDevice.FocusPointOfInterest = CoreGraphics.CGPoint.Empty;
-            _captureDevice.FocusMode = focusMode;
-            _captureDevice.UnlockForConfiguration();
+            if (device.FocusPointOfInterestSupported)
+                device.FocusPointOfInterest = CoreGraphics.CGPoint.Empty;
+            device.FocusMode = focusMode;
+            device.UnlockForConfiguration();
+        });
+    }
+
+    public void UpdateTargetCaptureResolution(Size targetCaptureResolution)
+    {
+        if (!targetCaptureResolution.Equals(TargetCaptureResolution))
+        {
+            TargetCaptureResolution = targetCaptureResolution;
+            UpdateCamera();
         }
     }
 
     public void Dispose()
     {
+    }
+
+    void CaptureDevicePerformWithLockedConfiguration(Action<AVCaptureDevice> handler)
+    {
+        if (_captureDevice != null && _captureDevice.LockForConfiguration(out var _))
+        {
+            try
+            {
+                handler(_captureDevice);
+            }
+            finally
+            {
+                _captureDevice.UnlockForConfiguration();
+            }
+        }
+    }
+
+    NSString findBestAVCaptureSessionPreset(MSize target)
+    {
+        if (target == MSize.Zero || _captureDevice == null)
+            return AVCaptureSession.Preset640x480;
+
+        var current = new KeyValuePair<NSString, Size>(AVCaptureSession.Preset640x480, new Size(640, 480));
+        var possibleResolutions = _availableResolutions.Where(res => _captureDevice.SupportsAVCaptureSessionPreset(res.Key));
+
+        foreach (var r in possibleResolutions)
+            if (r.Value.Width >= target.Width && r.Value.Height >= target.Height)
+            {
+                var targetWidthDistance = Math.Abs(target.Width - r.Value.Width);
+                var targetHeightDistance = Math.Abs(target.Height - r.Value.Height);
+                var currentWidthDistance = Math.Abs(current.Value.Width - r.Value.Width);
+                var currentHeightDistance = Math.Abs(current.Value.Height - r.Value.Height);
+
+                var targetDistance = targetWidthDistance + targetHeightDistance;
+                var currentDistance = currentWidthDistance + currentHeightDistance;
+
+                if (targetDistance < currentDistance)
+                    current = r;
+            }
+
+        return current.Key;
     }
 }
 

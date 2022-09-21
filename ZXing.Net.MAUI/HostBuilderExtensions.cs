@@ -11,6 +11,7 @@ global using NativePixelBufferData = global::System.Collections.Generic.IEnumera
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Hosting;
+using ZXing.Net.Maui.Controls;
 
 namespace ZXing.Net.Maui;
 
@@ -20,8 +21,8 @@ public static class CameraViewExtensions
     {
         builder.ConfigureMauiHandlers(handlers =>
         {
-            handlers.AddHandler(typeof(ICameraView), typeof(CameraViewHandler));
-            handlers.AddHandler(typeof(ICameraBarcodeReaderView), typeof(CameraBarcodeReaderViewHandler));
+            handlers.AddHandler(typeof(CameraView), typeof(CameraViewHandler));
+            handlers.AddHandler(typeof(CameraBarcodeReaderView), typeof(CameraBarcodeReaderViewHandler));
         });
     }
 
