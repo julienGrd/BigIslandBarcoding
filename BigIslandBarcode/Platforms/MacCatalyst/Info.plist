@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.15</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
@@ -28,7 +26,14 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+  
 	<key>NSCameraUsageDescription</key>
-	<string>Barcode Scanning</string>
+	<string>Required for barcode scanning</string>
+  
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>Required access to save barcode photos.</string>
+  
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Required access to barcode photos.</string>
 </dict>
 </plist>

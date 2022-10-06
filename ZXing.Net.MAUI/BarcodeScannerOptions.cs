@@ -1,14 +1,13 @@
-﻿namespace ZXing.Net.Maui
+﻿namespace ZXing.Net.Maui;
+
+public record BarcodeReaderOptions
+
 {
-	public record BarcodeReaderOptions
+	public bool AutoRotate { get; init; }
+	public bool TryHarder { get; init; }
 
-	{
-		public bool AutoRotate { get; init; }
-		public bool TryHarder { get; init; }
+	public BarcodeFormat Formats { get; init; }
 
-		public BarcodeFormat Formats { get; init; }
+	public bool Multiple { get; init; }
 
-		public bool Multiple { get; init; }
-
-	}
 }

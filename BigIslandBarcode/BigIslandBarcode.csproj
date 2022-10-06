@@ -3,9 +3,12 @@
 	<PropertyGroup>
 		<!-- iOS, Android, MacCatalyst -->
 		<TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
-		<OutputType>Exe</OutputType>
+    <!-- Windows -->
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.19041</TargetFrameworks>
+    <OutputType>Exe</OutputType>
 		<SingleProject>true</SingleProject>
 		<UseMaui>true</UseMaui>
+    <Nullable>enable</Nullable>
 
 		<!-- Display name -->
 		<ApplicationTitle>BigIslandBarcode</ApplicationTitle>
@@ -18,7 +21,14 @@
 
 		<UseSystemResourceKeys>false</UseSystemResourceKeys>
 
-		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-ios'">10.3.4</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.19041.0</SupportedOSPlatformVersion>
+    
+    <TargetPlatformMinVersion Condition="'$(TargetFramework)' == 'net6.0-android'">31.0</TargetPlatformMinVersion>
+    
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">15.4</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">14.0</TargetPlatformMinVersion>
+    <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+    <DefaultLanguage>en</DefaultLanguage>
 
 	</PropertyGroup>
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
@@ -39,8 +49,23 @@
 		<MauiFont Include="Resources\Fonts\*" />
 	</ItemGroup>
 
+  <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+    <!-- Required - WinUI does not yet have buildTransitive for everything -->
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.4" />
+    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.3.1" />
+  </ItemGroup>
+
 	<ItemGroup>
 	  <ProjectReference Include="..\ZXing.Net.MAUI\ZXing.Net.MAUI.csproj" />
 	</ItemGroup>
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+    <OutputType>WinExe</OutputType>
+    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows10.0.19041|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
 
 </Project>

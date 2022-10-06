@@ -2,11 +2,13 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0-android;net6.0-maccatalyst;net6.0-ios</TargetFrameworks>
     <!--<TargetFrameworks>net6.0-android</TargetFrameworks>-->
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.19041</TargetFrameworks>
     <PackageId>ZXing.Net.Maui.Jgdev</PackageId>
     <Title>ZXing.Net.MAUI Barcode Scanner for .NET MAUI</Title>
     <Authors>Redth</Authors>
     <UseMaui>True</UseMaui>
     <SingleProject>True</SingleProject>
+    <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseSystemResourceKeys>false</UseSystemResourceKeys>
     <Copyright>Copyright © Redth</Copyright>
@@ -19,20 +21,29 @@
     <Version>1.0.5</Version>
     <DebugType>portable</DebugType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
     <!--<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-android'">21.0</SupportedOSPlatformVersion>-->
+    <TargetPlatformMinVersion Condition="'$(TargetFramework)' == 'net6.0-android'">31.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">14.0</TargetPlatformMinVersion>
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-      <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
-    <PackageReference Include="Xamarin.AndroidX.Camera.Camera2" Version="1.0.2.4" />
-    <PackageReference Include="Xamarin.AndroidX.Camera.Lifecycle" Version="1.0.2.4" />
-    <PackageReference Include="Xamarin.AndroidX.Camera.View" Version="1.0.0.4-alpha20" />
+    <PackageReference Include="Xamarin.AndroidX.Camera.Camera2" Version="1.1.0" />
+    <PackageReference Include="Xamarin.AndroidX.Camera.Lifecycle" Version="1.1.0" />
+    <PackageReference Include="Xamarin.AndroidX.Camera.View" Version="1.1.0" />
 
     <AndroidManifest Include="Platforms/Android/AndroidManifest.xml" />
   </ItemGroup>
+	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+    <PackageReference Include="Microsoft.Maui.Graphics.Skia" Version="6.0.300" />
+  </ItemGroup>
   <ItemGroup>
-    <!--<PackageReference Include="Microsoft.Maui.Graphics" Version="6.0.300-rc.1.1215" />-->
     <PackageReference Include="ZXing.Net" Version="0.16.8" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows10.0.19041|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
 </Project>
