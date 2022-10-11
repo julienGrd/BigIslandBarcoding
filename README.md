@@ -1,4 +1,5 @@
 ------------------------------OBSOLETE-----------------------------------------------
+
 this project (and associated package) have no reason to live anymore, since the original project ZXing.Net.Maui (https://github.com/Redth/ZXing.Net.Maui) was corrected and a package published. 
 
 Please Fork the original repository instead of this one, same thing for opening issues
