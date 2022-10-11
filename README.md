@@ -1,10 +1,8 @@
-Fork from https://github.com/Redth/BigIslandBarcoding with code updated to make it run and compile following the last visual studios version and MAUI preview
+------------------------------OBSOLETE-----------------------------------------------
+this project (and associated package) have no reason to live anymore, since the original project ZXing.Net.Maui (https://github.com/Redth/ZXing.Net.Maui) was corrected and a package published. 
 
-Current preview : RC2
+Please Fork the original repository instead of this one, same thing for opening issues
 
-Current package : https://www.nuget.org/packages/ZXing.Net.Maui.Jgdev/ 1.0.4
-
-Note : it seem the IOS version doesn't work (see https://github.com/julienGrd/BigIslandBarcoding/issues/1). I don't have the equipment to test the IOS version, please don't hesitate to investigate and submit a PR if you are able to correct it.
 
 # ZXing.Net.MAUI
 The successor to ZXing.Net.Mobile
