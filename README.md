@@ -14,13 +14,11 @@ Android<br/>(Camera Scanning) | Windows<br/>(File Scanning) | Mac/iOS<br/>(Camer
 Platform | Min. Version | Barcode Generating | Camera Scanning | File Scanning
 --- | --- | --- | --- | ---
 Android | 12 (API 31) | ✔ | ✔ | ✔
-iOS | 10 | ✔ | ❌<b>*</b> | ✔
+iOS | 10 | ✔ | ✔ | ✔
 macOS | 14 | ✔ | ✔ | ✔
 Windows | 11 OR 10 (> 1809) | ✔ | ❌<sup>**Ŧ**</sup> | ✔
 
 <sup>**Ŧ**</sup> <small>_There is no MAUI support for the camera yet. We are monitoring CommunityToolkit/Maui#259 - For now, Windows just loads a black screen, you will need to detect/redirect_</small>
-
-<b>*</b> <small>_IOS version doesn't work (see [#1](https://github.com/julienGrd/BigIslandBarcoding/issues/1)). I can't test the IOS version so please investigate and submit a PR if you are able to correct it._</small>
 
 ## Install ZXing.Net.MAUI
 
