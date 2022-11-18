@@ -17,8 +17,8 @@ internal partial class CameraManager
     ImageAnalysis _imageAnalyzer;
     PreviewView _previewView;
     IExecutorService? _cameraExecutor;
-    CameraSelector _cameraSelector = null;
-    ProcessCameraProvider _cameraProvider;
+    CameraSelector? _cameraSelector = null;
+    ProcessCameraProvider? _cameraProvider;
     ICamera _camera;
     Timer? _timer;
 
@@ -31,10 +31,11 @@ internal partial class CameraManager
     }
 
     [MemberNotNull("_previewView")]
+    [MemberNotNull("_cameraExecutor")]
     public NativePlatformCameraPreviewView CreateNativeView()
     {
         _previewView = new PreviewView(_context);
-        _cameraExecutor = Executors.NewSingleThreadExecutor();
+        _cameraExecutor = Executors.NewSingleThreadExecutor()!;
 
         return _previewView;
     }
@@ -74,8 +75,12 @@ internal partial class CameraManager
 
             UpdateCamera();
             AutoFocus();
-            setupAutoFocusTimer();
-            ((View)_previewView.Parent).SetOnTouchListener(new TapFocusTouchListener(this));
+            try
+            {
+                setupAutoFocusTimer();
+                ((View)_previewView.Parent).SetOnTouchListener(new TapFocusTouchListener(this));
+            }
+            catch { }
 
         }), ContextCompat.GetMainExecutor(_context)); //GetMainExecutor: returns an Executor that runs on the main thread.
     }
@@ -111,9 +116,17 @@ internal partial class CameraManager
             _timer.Dispose();
             _timer = null;
         }
-        _timer = new Timer();
-        var task = new AFTimerTask(this);
-        _timer.ScheduleAtFixedRate(task, 5000, 5000);
+
+        try
+        {
+            _timer = new Timer();
+            var task = new AFTimerTask(this);
+            _timer.ScheduleAtFixedRate(task, 5000, 5000);
+        }
+        catch
+        {
+            // Auto focus failed, continue without it
+        }
     }
 
     private class AFTimerTask : TimerTask

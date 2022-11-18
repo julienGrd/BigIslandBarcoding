@@ -6,27 +6,27 @@ namespace ZXing.Net.Maui.Readers;
 public class ZXingBarcodeReader : IBarcodeReader
 {
 	readonly BarcodeReaderGeneric _zxingReader;
+	BarcodeReaderOptions? _options;
 
 	public ZXingBarcodeReader()
 	{
 		_zxingReader = new BarcodeReaderGeneric();
 	}
 
-	BarcodeReaderOptions? options;
 	public BarcodeReaderOptions Options
 	{
 
-		get => options ??= new BarcodeReaderOptions();
+		get => _options ??= new BarcodeReaderOptions();
 		set
 		{
-			options = value;
-			_zxingReader.Options.PossibleFormats = options.Formats.ToZXingList();
-			_zxingReader.Options.TryHarder = options.TryHarder;
-			_zxingReader.AutoRotate = options.AutoRotate;
+			_options = value;
+			_zxingReader.Options.PossibleFormats = Options.Formats.ToZXingList();
+			_zxingReader.Options.TryHarder = Options.TryHarder;
+			_zxingReader.AutoRotate = Options.AutoRotate;
 		}
 	}
 
-	public BarcodeResult[]? Decode(PixelBufferHolder image)
+    public BarcodeResult[]? Decode(PixelBufferHolder image)
     {
         var ls = GetLuminanceSource(image);
 

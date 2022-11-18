@@ -12,7 +12,7 @@ internal partial class CameraManager : IDisposable
         CameraLocation = cameraLocation;
     }
 
-    public event EventHandler<CameraFrameBufferEventArgs> FrameReady;
+    public event EventHandler<CameraFrameBufferEventArgs>? FrameReady;
 
     public CameraLocation CameraLocation { get; private set; }
 

@@ -15,14 +15,14 @@ namespace ZXing.Net.Maui;
 
 internal partial class CameraManager
 {
-    AVCaptureSession _captureSession;
+    AVCaptureSession _captureSession = null!;
     AVCaptureDevice? _captureDevice;
     AVCaptureInput? _captureInput = null;
-    PreviewView _view;
-    AVCaptureVideoDataOutput _videoDataOutput;
-    AVCaptureVideoPreviewLayer _videoPreviewLayer;
-    CaptureDelegate _captureDelegate;
-    DispatchQueue _dispatchQueue;
+    PreviewView _view = null!;
+    AVCaptureVideoDataOutput? _videoDataOutput;
+    AVCaptureVideoPreviewLayer _videoPreviewLayer = null!;
+    CaptureDelegate? _captureDelegate;
+    DispatchQueue? _dispatchQueue;
     static Dictionary<NSString, MSize> _availableResolutions => new()
     {
         { AVCaptureSession.Preset352x288, new MSize(352, 288) },
@@ -163,6 +163,7 @@ internal partial class CameraManager
         if (_captureSession.Running)
             _captureSession.StopRunning();
 
+        if (_videoDataOutput != null)
         _captureSession.RemoveOutput(_videoDataOutput);
 
         // Cleanup old input

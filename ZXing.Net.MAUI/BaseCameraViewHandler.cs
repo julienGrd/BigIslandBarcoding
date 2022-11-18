@@ -22,7 +22,7 @@ public abstract class BaseCameraViewHandler<T> : ViewHandler<T, NativePlatformCa
 
 	internal CameraManager? CameraManager;
 
-	public event EventHandler<CameraFrameBufferEventArgs> FrameReady;
+	public event EventHandler<CameraFrameBufferEventArgs>? FrameReady;
 
 	public BaseCameraViewHandler() : base(CameraViewMapper)
 	{

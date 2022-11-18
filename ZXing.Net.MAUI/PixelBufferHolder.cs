@@ -45,6 +45,12 @@ public record PixelBufferHolder
 
 #endif
 
+    /// <summary>
+    /// Create the necessary <see cref="PixelBufferHolder"/> from a stream
+    /// </summary>
+    /// <param name="stream">The stream to pick pixel data from</param>
+    /// <returns></returns>
+    /// <exception cref="NullReferenceException"></exception>
     public static PixelBufferHolder FromStream(Stream stream)
     {
 #if WINDOWS
@@ -52,11 +58,12 @@ public record PixelBufferHolder
         var image = new Microsoft.Maui.Graphics.Skia.SkiaImageLoadingService().FromStream(stream) as Microsoft.Maui.Graphics.Skia.SkiaImage;
 
         var data = image!.PlatformRepresentation.Pixels.SelectMany(x => new[] { x.Red, x.Green, x.Blue }).ToArray();
+
 #else
-        var image = (
-            Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream)
-                as Microsoft.Maui.Graphics.Platform.PlatformImage
-        )!;
+
+        var image = 
+            (Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream) 
+                as Microsoft.Maui.Graphics.Platform.PlatformImage)!;
 
 #if IOS || MACCATALYST
         
@@ -72,7 +79,7 @@ public record PixelBufferHolder
         if (data == null)
             throw new NullReferenceException("Could not convert stream to native bytes");
 
-#else
+#elif ANDROID
 
         var pixelArr = new int[(int)(image.Width * image.Height)];
 
@@ -80,6 +87,10 @@ public record PixelBufferHolder
         image!.PlatformRepresentation.Recycle();
 
         var data = pixelArr.Select(x => (byte)BitConverter.GetBytes(x).Average(y => (decimal)y));
+
+#else
+
+        throw new PlatformNotSupportedException();
 
 #endif
 
