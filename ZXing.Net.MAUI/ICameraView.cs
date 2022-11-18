@@ -9,7 +9,7 @@ public interface ICameraFrameAnalyzer
 	event EventHandler<CameraFrameBufferEventArgs> FrameReady;
 }
 
-public interface ICameraView : IView, ICameraFrameAnalyzer
+public interface ICameraView : IView, ICameraFrameAnalyzer, IDisposable
 {
 	CameraLocation CameraLocation { get; set; }
 

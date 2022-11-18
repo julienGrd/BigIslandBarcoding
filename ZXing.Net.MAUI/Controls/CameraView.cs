@@ -6,7 +6,7 @@ namespace ZXing.Net.Maui.Controls;
 
 public partial class CameraView : View, ICameraView
 {
-	public event EventHandler<CameraFrameBufferEventArgs> FrameReady;
+	public event EventHandler<CameraFrameBufferEventArgs>? FrameReady;
 
 	protected override void OnHandlerChanging(HandlerChangingEventArgs args)
 	{
@@ -45,6 +45,11 @@ public partial class CameraView : View, ICameraView
 	public void Focus(Point point)
 		=> StrongHandler?.Invoke(nameof(Focus), point);
 
-	CameraViewHandler StrongHandler 
-		=> (Handler as CameraViewHandler)!;
+    public void Dispose()
+    {
+        StrongHandler?.Dispose();
+    }
+
+    CameraViewHandler? StrongHandler 
+		=> (Handler as CameraViewHandler);
 }
