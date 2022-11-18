@@ -40,10 +40,17 @@ public partial class MainPage : ContentPage
 
 			MainThread.InvokeOnMainThreadAsync(() =>
 			{
-				var r = e.Results.First();
+                try
+                {
+                    var r = e.Results.First();
 
-				barcodeGenerator.Value = r.Value;
-				barcodeGenerator.Format = r.Format;
+                    barcodeGenerator.Value = r.Value;
+                    barcodeGenerator.Format = r.Format;
+                }
+                catch
+                {
+                    //Stop things like `PHARMA_CODE` from throwing
+                }
 			});
 
 			_lastResult = now;

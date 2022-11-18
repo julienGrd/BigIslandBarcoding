@@ -28,7 +28,12 @@ public partial class PickImagePage : ContentPage
                     AutoRotate = true
                 }
             };
+
+        NavigatedTo += PageNavigatedTo;
     }
+
+    async void PageNavigatedTo(object? sender, NavigatedToEventArgs e)
+        => await CallFilePicker();
 
     async void PickClicked(object sender, EventArgs e)
         => await CallFilePicker();
@@ -119,9 +124,16 @@ public partial class PickImagePage : ContentPage
             {
                 ParseResult.Text = $"Found Barcode\nValue: {result.Value}";
 
-                barcodeGenerator.IsVisible = true;
-                barcodeGenerator.Value = result.Value;
-                barcodeGenerator.Format = result.Format;
+                try
+                {
+                    barcodeGenerator.Value = result.Value;
+                    barcodeGenerator.Format = result.Format;
+                    barcodeGenerator.IsVisible = true;
+                }
+                catch (Exception ex)
+                {
+                    ParseResult.Text += "\r\nError displaying barcode: " + ex.Message;
+                }
             }
             else
             {
