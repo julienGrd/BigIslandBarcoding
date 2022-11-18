@@ -18,7 +18,7 @@
     <AssemblyFileVersion>$(PackageVersion)</AssemblyFileVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Description>barcode scanner for .NET MAUI, fork from https://github.com/Redth/ZXing.NET.Maui to add partial support for windows</Description>
-    <Version>2.0.0-alpha.1</Version>
+    <Version>2.0.0-alpha.4</Version>
     <DebugType>portable</DebugType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     
