@@ -3,6 +3,12 @@ using System.Linq;
 using System.IO;
 using Microsoft.Maui.Graphics;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+#if WINDOWS
+using System.Diagnostics;
+using System.Drawing.Imaging;
+using System.Threading;
+#endif
 
 namespace ZXing.Net.Maui.Readers;
 
@@ -57,7 +63,17 @@ public record PixelBufferHolder
 
         var image = new Microsoft.Maui.Graphics.Skia.SkiaImageLoadingService().FromStream(stream) as Microsoft.Maui.Graphics.Skia.SkiaImage;
 
-        var data = image!.PlatformRepresentation.Pixels.SelectMany(x => new[] { x.Red, x.Green, x.Blue }).ToArray();
+        var dataList = new List<byte> { };
+
+        var mySpan = CollectionsMarshal.AsSpan(image!.PlatformRepresentation.Pixels.ToList());
+        for (var i = 0; i < mySpan.Length; i++)
+        {
+            dataList.Add(mySpan[i].Red);
+            dataList.Add(mySpan[i].Green);
+            dataList.Add(mySpan[i].Blue);
+        }
+
+        var data = dataList.ToArray();
 
 #else
 
@@ -86,7 +102,25 @@ public record PixelBufferHolder
         image!.PlatformRepresentation.GetPixels(pixelArr, 0, (int)image.Width, 0, 0, (int)image.Width, (int)image.Height);
         image!.PlatformRepresentation.Recycle();
 
-        var data = pixelArr.Select(x => (byte)BitConverter.GetBytes(x).Average(y => (decimal)y));
+        var dataList = new List<byte> { };
+
+        var mySpan = CollectionsMarshal.AsSpan(pixelArr.ToList());
+        
+        for (var i = 0; i < mySpan.Length; i++)
+        {
+            var intValue = mySpan[i];
+
+            dataList.Add(
+                (byte)((
+                    (intValue >> 24) +
+                    (intValue >> 16) +
+                    (intValue >> 8) +
+                    (byte)intValue
+                    ) / 4)
+            );
+        }
+
+        var data = dataList.ToArray();
 
 #else
 
